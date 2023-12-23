@@ -12,6 +12,8 @@
 #include <GL/glew.h>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
+#include <json.hpp>
+#include <sstream>
 
 #include <assimp/Importer.hpp>
 #include <glm/glm.hpp>
@@ -21,6 +23,7 @@
 
 #include "mglTransform.hpp"
 
+using json = nlohmann::json;
 namespace mgl {
 
 class IDrawable {
@@ -49,7 +52,6 @@ class Mesh : public IDrawable {
   Mesh();
   ~Mesh();
 
-
   void setAssimpFlags(unsigned int flags);
   void joinIdenticalVertices();
   void generateNormals();
@@ -70,11 +72,18 @@ class Mesh : public IDrawable {
   bool hasTexcoords();
   bool hasTangentsAndBitangents();
 
+  void setEffect(int);
+  int getEffect();
+
+  json toJSON();
+  void fromJSON(json j);
+
  private:
   GLuint VaoId;
   unsigned int AssimpFlags;
   bool NormalsLoaded, TexcoordsLoaded, TangentsAndBitangentsLoaded;
   Transform* transform = nullptr;
+  int effect;
 
   struct MeshData {
     unsigned int nIndices = 0;
@@ -96,6 +105,8 @@ class Mesh : public IDrawable {
   void processMesh(const aiMesh *mesh);
   void createBufferObjects();
   void destroyBufferObjects();
+  json vecOfMeshDataToJSON(std::vector<MeshData> vec);
+  std::vector<MeshData> toVecOfMeshData(json j);
 };
 
 ////////////////////////////////////////////////////////////////////////////////

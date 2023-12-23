@@ -11,8 +11,12 @@
 
 #include <glm/glm.hpp>
 #include <vector>
+#include <json.hpp>
+
+using json = nlohmann::json;
 
 #include "mglMesh.hpp"
+#include "mglShader.hpp"
 
 namespace mgl {
 
@@ -33,7 +37,10 @@ public:
 	virtual ~Node();
 	void setMesh(Mesh* m);
 	Mesh* getMesh();
-	void draw();
+	void draw(ShaderProgram*);
+	json toJSON();
+	void fromJSON(json j);
+
 };
 
 class SceneGraph {
@@ -43,7 +50,7 @@ public:
 	SceneGraph();
 	~SceneGraph();
 	void addNode(Node *node);
-	void draw();
+	void draw(ShaderProgram*);
 	void load(const char* path);
 	void save(const char* path);
 	void setRoot(Node *node);

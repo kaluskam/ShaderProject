@@ -231,5 +231,146 @@ void Mesh::draw() {
   glBindVertexArray(0);
 }
 
+void Mesh::setEffect(int e) {
+    this->effect = e;
+}
+
+int Mesh::getEffect() {
+    return effect;
+}
+
+json glmVec3ToJSON(glm::vec3 v) {
+    json j = json::array();
+    j.push_back(v.x);
+    j.push_back(v.y);
+    j.push_back(v.z);
+
+    return j;
+}
+
+json glmVec2ToJSON(glm::vec2 v) {
+    json j = json::array();
+    j.push_back(v.x);
+    j.push_back(v.y);
+
+    return j;
+}
+
+
+//template <typename T>
+//json vectorToJSON(std::vector<T> vec) {
+//    json j = json::array();
+//    for (int i = 0; i < vec.size(); i++) {
+//        j.push_back(glmVecToString<T>(vec[i]));
+//    }
+//    return j;
+//}
+
+json vecOfGlmVec3ToJSON(std::vector<glm::vec3> vec) {
+    json j = json::array();
+    for (int i = 0; i < vec.size(); i++) {
+        j.push_back(glmVec3ToJSON(vec[i]));
+    }
+    return j;
+}
+
+json vecOfGlmVec2ToJSON(std::vector<glm::vec2> vec) {
+    json j = json::array();
+    for (int i = 0; i < vec.size(); i++) {
+        j.push_back(glmVec2ToJSON(vec[i]));
+    }
+    return j;
+}
+
+json vecOfIntToJSON(std::vector<unsigned int> vec) {
+    json j = json::array();
+    for (int i = 0; i < vec.size(); i++) {
+        j.push_back(vec[i]);
+    }
+    return j;
+}
+
+json Mesh::vecOfMeshDataToJSON(std::vector<MeshData> vec) {
+    json j = json::array();
+    for (int i = 0; i < vec.size(); i++) {
+        json jMeshData = json::object();
+        jMeshData["nIndices"] = vec[i].nIndices;
+        jMeshData["baseIndex"] = vec[i].baseIndex;
+        jMeshData["baseVertex"] = vec[i].baseVertex;
+        j.push_back(jMeshData);
+    }
+    return j;
+}
+
+json Mesh::toJSON() {
+    json j;
+
+    j["Positions"] = vecOfGlmVec3ToJSON(Positions);
+    j["Normals"] = vecOfGlmVec3ToJSON(Normals);
+    j["Texcoords"] = vecOfGlmVec2ToJSON(Texcoords);
+    j["Tangents"] = vecOfGlmVec3ToJSON(Tangents);
+    j["Bitangents"] = vecOfGlmVec3ToJSON(Bitangents);
+    j["Indices"] = vecOfIntToJSON(Indices);
+    j["Meshes"] = vecOfMeshDataToJSON(Meshes);
+    return j;
+}
+
+std::vector<glm::vec3> toVecOfGlmVec3(json j) {
+    std::vector<glm::vec3> result;
+   
+    for (json::iterator it = j.begin(); it != j.end(); ++it) {
+        float vecArr[3] = { 0, 0, 0 };
+        int i = 0;
+        for (json::iterator it2 = it->begin(); it2 != it->end(); it2++) {
+            vecArr[i++] = it2.value();
+        }
+        result.push_back(glm::vec3(vecArr[0], vecArr[1], vecArr[2]));
+    }
+
+    return result;
+}
+
+std::vector<glm::vec2> toVecOfGlmVec2(json j) {
+    std::vector<glm::vec2> result;
+    for (json::iterator it = j.begin(); it != j.end(); ++it) {
+        float vecArr[2] = { 0, 0 };
+        int i = 0;
+        for (json::iterator it2 = it->begin(); it2 != it->end(); it2++) {
+            vecArr[i++] = it2.value();
+        }
+        result.push_back(glm::vec2(vecArr[0], vecArr[1]));
+    }
+    return result;
+}
+
+std::vector<unsigned int> toVecOfUint(json j) {
+    std::vector<unsigned int> result;
+    for (int i = 0; i < j.size(); i++) {
+        result.push_back(j[i]);
+    }
+    return result;
+}
+
+std::vector<Mesh::MeshData> Mesh::toVecOfMeshData(json j) {
+    std::vector<MeshData> result;
+    for (int i = 0; i < j.size(); i++) {
+        MeshData md{};
+        md.nIndices = j[i]["nIndices"];
+        md.baseIndex = j[i]["baseIndex"];
+        md.baseVertex = j[i]["baseVertex"];
+        result.push_back(md);
+    }
+    return result;
+}
+
+void Mesh::fromJSON(json j) {
+    Positions = toVecOfGlmVec3(j["Positions"]);
+    Normals = toVecOfGlmVec3(j["Normals"]);
+    Texcoords = toVecOfGlmVec2(j["Texcoords"]);
+    Tangents = toVecOfGlmVec3(j["Tangents"]);
+    Bitangents = toVecOfGlmVec3(j["Bitangents"]);
+    Indices = toVecOfUint(j["Indices"]);
+    Meshes = toVecOfMeshData(j["Meshes"]);
+}
 ////////////////////////////////////////////////////////////////////////////////
 }  // namespace mgl

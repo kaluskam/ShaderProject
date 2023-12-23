@@ -66,4 +66,24 @@
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="shader-vs.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="wood-fs.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="dynamic-vs.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="ambient-fs.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="global-vs.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="global-fs.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
 </Project>

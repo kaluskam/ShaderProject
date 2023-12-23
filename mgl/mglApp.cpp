@@ -152,7 +152,7 @@ void displayInfo() {
 }
 
 void Engine::setupOpenGL() {
-  glClearColor(1.f, 1.f, 1.f, 1.0f);
+  glClearColor(0.f, 0.f, 0.f, 1.0f);
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LEQUAL);
   glDepthMask(GL_TRUE);
