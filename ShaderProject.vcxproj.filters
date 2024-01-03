@@ -36,6 +36,9 @@
     <ClCompile Include="mgl\mglScenegraph.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="mgl\mglTransform.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mgl\mglMesh.hpp">

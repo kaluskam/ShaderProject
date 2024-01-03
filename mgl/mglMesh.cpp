@@ -16,6 +16,7 @@ Mesh::Mesh() {
   NormalsLoaded = false;
   TexcoordsLoaded = false;
   TangentsAndBitangentsLoaded = false;
+  MaterialsLoaded = false;
   VaoId = -1;
   AssimpFlags = aiProcess_Triangulate;
 }
@@ -47,6 +48,8 @@ bool Mesh::hasNormals() { return NormalsLoaded; }
 bool Mesh::hasTexcoords() { return TexcoordsLoaded; }
 
 bool Mesh::hasTangentsAndBitangents() { return TangentsAndBitangentsLoaded; }
+
+bool Mesh::hasMaterials() { return MaterialsLoaded; }
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -94,6 +97,9 @@ void Mesh::processMesh(const aiMesh *mesh) {
 
 void Mesh::processScene(const aiScene *scene) {
   Meshes.resize(scene->mNumMeshes);
+  if (scene->HasMaterials()) {
+      material = *scene->mMaterials[0];
+  }
   unsigned int n_vertices = 0;
   unsigned int n_indices = 0;
   for (unsigned int i = 0; i < Meshes.size(); i++) {
@@ -371,6 +377,10 @@ void Mesh::fromJSON(json j) {
     Bitangents = toVecOfGlmVec3(j["Bitangents"]);
     Indices = toVecOfUint(j["Indices"]);
     Meshes = toVecOfMeshData(j["Meshes"]);
+}
+
+Transform* Mesh::getTransform() {
+    return transform;
 }
 ////////////////////////////////////////////////////////////////////////////////
 }  // namespace mgl

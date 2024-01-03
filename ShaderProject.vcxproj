@@ -140,6 +140,7 @@
     <ClCompile Include="mgl\mglMesh.cpp" />
     <ClCompile Include="mgl\mglScenegraph.cpp" />
     <ClCompile Include="mgl\mglShader.cpp" />
+    <ClCompile Include="mgl\mglTransform.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mgl\mgl.hpp" />

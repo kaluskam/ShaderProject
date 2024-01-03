@@ -35,7 +35,7 @@ public:
 		double yoffset) override;
 	void mouseButtonCallback(GLFWwindow* window, int button, int action,
 		int mods)override;
-	void cursorCallback(GLFWwindow* window, double xpos, double ypos) override;
+	//void cursorCallback(GLFWwindow* window, double xpos, double ypos) override;
 
 private:
 	const GLuint UBO_BP = 0;
@@ -107,7 +107,7 @@ void MyApp::createShaderPrograms() {
 
 ///////////////////////////////////////////////////////////////////////// CAMERA
 
-glm::vec3 eye1 = glm::vec3(0.0f, 0.0f, 5.0f);
+glm::vec3 eye1 = glm::vec3(-5.0f, 0.0f, 5.0f);
 glm::vec3 center = glm::vec3(0.f);
 glm::vec3 up1 = glm::vec3(0.0f, 1.0f, 0.0f);
 const glm::mat4 ViewMatrix1 =
@@ -150,10 +150,12 @@ void MyApp::createScene() {
 	std::string mesh_dir = ".\\assets\\models\\";
 	std::string glass_file = "glass.obj";
 	std::string table_file = "tableColor.obj";
+	std::string background_file = "backgroundPlain.obj";
 	mgl::Node* sceneRoot = new mgl::Node();
 
 	mgl::Node* tableNode = new mgl::Node();
 	mgl::Node* glassNode = new mgl::Node();
+	mgl::Node* backgroundPlainNode = new mgl::Node();
 
 	mgl::Mesh* table = new mgl::Mesh();
 	table->joinIdenticalVertices();
@@ -172,6 +174,51 @@ void MyApp::createScene() {
 	glassNode->setParent(tableNode);
 	glassNode->setMesh(glass);
 
+	mgl::Mesh* backgroundPlain = new mgl::Mesh();
+	mgl::Transform* transform = new mgl::Transform();
+	transform->setRotation(180, glm::vec3(0, 1, 0));
+	transform->setTranslate(glm::vec3(3, 0, 0));
+	transform->calculateModelMatrix();
+
+	backgroundPlain->joinIdenticalVertices();
+	backgroundPlain->create(mesh_dir + background_file);
+	backgroundPlain->setTransform(transform);
+
+	backgroundPlain->setEffect(2);
+	backgroundPlainNode->setParent(sceneRoot);
+	backgroundPlainNode->setMesh(backgroundPlain);
+
+	// floor
+	mgl::Node* p2Node = new mgl::Node();
+	mgl::Mesh* p2 = new mgl::Mesh();
+	mgl::Transform* t2 = new mgl::Transform();
+	//t2->setRotation(90, glm::vec3(1, 0, 0));
+	//t2->setTranslate(glm::vec3(5, 0, 0));
+	t2->setScale(glm::vec3(1, 1, 2));
+
+	t2->calculateModelMatrix();
+	p2->joinIdenticalVertices();
+	p2->create(mesh_dir + "plane.obj");
+	p2->setTransform(t2);
+	p2->setEffect(3);
+	p2Node->setParent(sceneRoot);
+	p2Node->setMesh(p2);
+
+	// wall right
+	mgl::Node* p3Node = new mgl::Node();
+	mgl::Mesh* p3 = new mgl::Mesh();
+	mgl::Transform* t3 = new mgl::Transform();
+	t3->setRotation(90, glm::vec3(1, 0, 0));
+	t3->setTranslate(glm::vec3(0, 0, -2));
+	t3->setScale(glm::vec3(1, 1, 2));
+
+	t3->calculateModelMatrix();
+	p3->joinIdenticalVertices();
+	p3->create(mesh_dir + "plane.obj");
+	p3->setTransform(t3);
+	p3->setEffect(2);
+	p3Node->setParent(sceneRoot);
+	p3Node->setMesh(p3);
 	Scene = new mgl::SceneGraph();
 	Scene->setRoot(sceneRoot);
 	Scene->save(".\\scene.json");
@@ -232,6 +279,22 @@ void MyApp::keyCallback(GLFWwindow* window, int key, int scancode, int action,
 			Camera->setViewType(mgl::FROM_Y);
 		}
 	}
+
+	glm::vec3 v = glm::normalize(Camera->getViewMatrixInfo().Eye);
+	glm::vec3 s = glm::normalize(glm::cross(v, Camera->getViewMatrixInfo().Up));
+	glm::vec3 u = glm::normalize(glm::cross(s, v));
+	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {		
+		Camera->rotate(glm::vec3(-1 * u.x, -1 * u.y, -1 * u.z));
+	}
+	else if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+		Camera->rotate(u);
+	}
+	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+		Camera->rotate(s);
+	}
+	else if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+		Camera->rotate(glm::vec3(-1 * s.x, -1 * s.y, -1 * s.z));
+	}	
 }
 
 void MyApp::mouseButtonCallback(GLFWwindow* window, int button, int action,
@@ -251,46 +314,6 @@ void MyApp::scrollCallback(GLFWwindow* window, double xoffset,
 	if (yoffset < 0) {
 		Camera->zoomIn();
 	}
-}
-
-void MyApp::cursorCallback(GLFWwindow* window, double xpos, double ypos) {
-	//TODO
-	//if pressed start rotating camera around center
-	//APPLY ROTATIONS
-	//Store last xpos and ypos and rotate if it changed but only a bit
-
-	if (!mouseBtnPressed) return;
-	if (xposl == 0 && yposl == 0) {
-		xposl = xpos;
-		yposl = ypos;
-	}
-	glm::vec3 v = glm::normalize(Camera->getViewMatrixInfo().Eye - glm::vec3(0, 0, 0));
-	glm::vec3 s = glm::normalize(glm::cross(v, Camera->getViewMatrixInfo().Up));
-	glm::vec3 u = glm::cross(s, v);
-
-	if (xposl < xpos) {
-		//Rotate left
-		Camera->rotate(glm::vec3(-1 * u.x, -1 * u.y, -1 * u.z));
-	}
-	else if (xposl > xpos) {
-		//Rotate Right
-		Camera->rotate(u);
-	}
-	if (yposl < ypos) {
-		Camera->rotate(s);
-	}
-	else if (yposl > ypos) {
-		Camera->rotate(glm::vec3(-1 * s.x, -1 * s.y, -1 * s.z));
-	}
-	yposl = ypos;
-	xposl = xpos;
-	/*
-	//Update Eye
-	glm::vec3 axis = glm::vec3(1, 1, 1);
-	glm::quat PQ = glm::quat(0,active.Eye.x, active.Eye.y, active.Eye.z);
-	glm::quat QQ = glm::quat(cos(rotAngle / 2), sin(rotAngle / 2)*axis.x, sin(rotAngle / 2) * axis.y, sin(rotAngle / 2) * axis.z);
-	glm::quat QpQ = QQ * PQ * glm::inverse(QQ);
-	*/
 }
 
 

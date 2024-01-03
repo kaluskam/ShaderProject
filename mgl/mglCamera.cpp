@@ -91,23 +91,22 @@ void Camera::zoomOut() {
 }
 
 void Camera::applyZoom() {
-    ViewMatrixInfo activeVM = viewMatrices[viewType];
-    activeVM.viewMatrix = glm::lookAt(activeVM.Eye * zoom, glm::vec3(0.f), activeVM.Up);
-    viewMatrices[viewType] = activeVM;
-    setViewMatrix(activeVM.viewMatrix);
+    ViewMatrixInfo* activeVM = &viewMatrices[viewType];
+    activeVM->viewMatrix = glm::lookAt(activeVM->Eye * zoom, glm::vec3(0.f), activeVM->Up);
+    setViewMatrix(activeVM->viewMatrix);
 }
 
 void Camera::rotate(glm::vec3 rotationAxis) {
-    ViewMatrixInfo activeVM = viewMatrices[viewType];
+    ViewMatrixInfo* activeVM = &viewMatrices[viewType];
     // EYE rotation
-    activeVM.Eye = rotateVec(activeVM.Eye, rotationAxis);
+    activeVM->Eye = rotateVec(activeVM->Eye, rotationAxis);
 
     // UP rotation
-    activeVM.Up = rotateVec(activeVM.Up, rotationAxis);
+    activeVM->Up = rotateVec(activeVM->Up, rotationAxis);
 
-    activeVM.viewMatrix = glm::lookAt(activeVM.Eye * zoom, glm::vec3(0.0f, 0.0f, 0.0f),
-        activeVM.Up);
-    setViewMatrix(activeVM.viewMatrix);
+    activeVM->viewMatrix = glm::lookAt(activeVM->Eye * zoom, glm::vec3(0.0f, 0.0f, 0.0f),
+        activeVM->Up);
+    setViewMatrix(activeVM->viewMatrix);
 }
 
 glm::vec3 Camera::rotateVec(glm::vec3 v, glm::vec3 axis) {

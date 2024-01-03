@@ -49,6 +49,8 @@ class Mesh : public IDrawable {
 #endif
   static const GLuint COLOR = 5;
 
+  aiMaterial material;
+
   Mesh();
   ~Mesh();
 
@@ -65,12 +67,13 @@ class Mesh : public IDrawable {
   //void draw(bool drawChildren = true, Mesh* drawSelected = NULL);
 
 
-  Transform &getTransform(void);
+  Transform* getTransform();
   void setTransform(Transform*);
 
   bool hasNormals();
   bool hasTexcoords();
   bool hasTangentsAndBitangents();
+  bool hasMaterials();
 
   void setEffect(int);
   int getEffect();
@@ -81,7 +84,7 @@ class Mesh : public IDrawable {
  private:
   GLuint VaoId;
   unsigned int AssimpFlags;
-  bool NormalsLoaded, TexcoordsLoaded, TangentsAndBitangentsLoaded;
+  bool NormalsLoaded, TexcoordsLoaded, TangentsAndBitangentsLoaded, MaterialsLoaded;
   Transform* transform = nullptr;
   int effect;
 

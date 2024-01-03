@@ -1,6 +1,7 @@
 #include "mglScenegraph.hpp"
-
+#include "mglConventions.hpp"
 #include <json.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <fstream>
 
 using json = nlohmann::json;
@@ -38,6 +39,13 @@ namespace mgl {
 
 	void Node::draw(ShaderProgram* shaderProgram) {
 		glUniform1i(shaderProgram->Uniforms["effect"].index, (GLuint) mesh->getEffect());
+		if (mesh->getTransform() == nullptr) {
+			glUniformMatrix4fv(shaderProgram->Uniforms[mgl::MODEL_MATRIX].index, 1, GL_FALSE, glm::value_ptr(glm::mat4(1.f)));
+		}
+		else {
+			auto modelMatrix = mesh->getTransform()->getModelMatrix();
+			glUniformMatrix4fv(shaderProgram->Uniforms[mgl::MODEL_MATRIX].index, 1, GL_FALSE, glm::value_ptr(modelMatrix));
+		}
 		mesh->draw();
 
 		for (Node* n : children) {
